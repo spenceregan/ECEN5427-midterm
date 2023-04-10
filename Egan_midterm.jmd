@@ -1,0 +1,25 @@
+---
+title: "ECEN 5447 Midterm"
+author: Spencer Egan
+date: April 04, 2023
+weave_options:
+    out_path: output
+---
+All the code for linearizing the full-order system can be found in the file NetworkDynamics.jl.  We load that module and print the eigenvalues of our linearized system below. Note that we are using the scheduled P-Q values here and solving the static load flow before linearizing the system. The package allows for loading both the scheduled values, or an existing solution (such as the one from the book).
+```julia
+include("NetworkDynamics.jl")
+using .NetworkDynamics
+using LinearAlgebra, CSV, DataFrames
+
+root = dirname(@__FILE__)
+Zdfpath = joinpath(root, "network.csv")
+busespath = joinpath(root, "bustypes.csv")
+genspath = joinpath(root, "gendata.csv")
+Zdf = CSV.read(Zdfpath, DataFrame)
+busdf = CSV.read(busespath, DataFrame)
+gendf = CSV.read(genspath, DataFrame)
+mynetwork = Network(Zdf, busdf, gendf, AsScheduled())
+eigenvals = eigen(Asys(mynetwork)).values
+
+show(stdout, "text/plain", eigenvals)
+```
